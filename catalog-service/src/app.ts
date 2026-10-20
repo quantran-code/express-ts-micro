@@ -1,5 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
+import { booksRouter } from './books/booksRouter';
 import { HttpError } from './errors/httpError';
+import { internalBooksRouter } from './internal/internalBooksRouter';
+import { requireIdentity } from './middleware/identity';
+import { requireServiceKey } from './middleware/serviceKey';
 
 const app = express();
 
@@ -9,7 +13,10 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', service: 'catalog-service' });
 });
 
-// TODO: mount this service's routes here once implemented.
+app.use(requireServiceKey);
+
+app.use('/books', requireIdentity, booksRouter);
+app.use('/internal/books', internalBooksRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not Found' });
