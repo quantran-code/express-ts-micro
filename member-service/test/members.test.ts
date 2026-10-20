@@ -86,8 +86,8 @@ describe('public member routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([
-      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com' },
-      { id: 2, name: 'Grace Hopper', email: 'grace@example.com' },
+      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com', active: true },
+      { id: 2, name: 'Grace Hopper', email: 'grace@example.com', active: true },
     ]);
   });
 
@@ -102,7 +102,12 @@ describe('public member routes', () => {
     const res = await request(app).get('/members/2').set(librarian);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: 2, name: 'Grace Hopper', email: 'grace@example.com' });
+    expect(res.body).toEqual({
+      id: 2,
+      name: 'Grace Hopper',
+      email: 'grace@example.com',
+      active: true,
+    });
   });
 
   it('returns 404 for an unknown member id', async () => {
@@ -119,7 +124,7 @@ describe('public member routes', () => {
       .send({ name: 'Ada King' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: 1, name: 'Ada King', email: 'ada@example.com' });
+    expect(res.body).toEqual({ id: 1, name: 'Ada King', email: 'ada@example.com', active: true });
   });
 
   it('normalises a patched email to lowercase', async () => {
@@ -143,8 +148,8 @@ describe('public member routes', () => {
 
     const stored = await request(app).get('/members').set(librarian);
     expect(stored.body).toEqual([
-      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com' },
-      { id: 2, name: 'Grace Hopper', email: 'grace@example.com' },
+      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com', active: true },
+      { id: 2, name: 'Grace Hopper', email: 'grace@example.com', active: true },
     ]);
   });
 
@@ -167,21 +172,36 @@ describe('public member routes', () => {
     expect(res.status).toBe(400);
 
     const stored = await request(app).get('/members/1').set(librarian);
-    expect(stored.body).toEqual({ id: 1, name: 'Ada Lovelace', email: 'ada@example.com' });
+    expect(stored.body).toEqual({
+      id: 1,
+      name: 'Ada Lovelace',
+      email: 'ada@example.com',
+      active: true,
+    });
   });
 
   it('returns the unchanged member for an empty patch', async () => {
     const res = await request(app).patch('/members/1').set(librarian).send({});
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: 1, name: 'Ada Lovelace', email: 'ada@example.com' });
+    expect(res.body).toEqual({
+      id: 1,
+      name: 'Ada Lovelace',
+      email: 'ada@example.com',
+      active: true,
+    });
   });
 
   it('ignores unknown keys in a patch', async () => {
     const res = await request(app).patch('/members/1').set(librarian).send({ role: 'admin' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: 1, name: 'Ada Lovelace', email: 'ada@example.com' });
+    expect(res.body).toEqual({
+      id: 1,
+      name: 'Ada Lovelace',
+      email: 'ada@example.com',
+      active: true,
+    });
   });
 
   it('rejects an empty or whitespace-only name on patch', async () => {
@@ -192,7 +212,12 @@ describe('public member routes', () => {
     expect(blank.status).toBe(400);
 
     const stored = await request(app).get('/members/1').set(librarian);
-    expect(stored.body).toEqual({ id: 1, name: 'Ada Lovelace', email: 'ada@example.com' });
+    expect(stored.body).toEqual({
+      id: 1,
+      name: 'Ada Lovelace',
+      email: 'ada@example.com',
+      active: true,
+    });
   });
 
   it('returns 404 when patching an unknown member id', async () => {

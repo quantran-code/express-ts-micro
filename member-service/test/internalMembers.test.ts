@@ -23,7 +23,12 @@ describe('internal member routes', () => {
       .send({ name: 'Grace Hopper', email: 'grace@example.com' });
 
     expect(res.status).toBe(201);
-    expect(res.body).toEqual({ id: 1, name: 'Grace Hopper', email: 'grace@example.com' });
+    expect(res.body).toEqual({
+      id: 1,
+      name: 'Grace Hopper',
+      email: 'grace@example.com',
+      active: true,
+    });
   });
 
   it('normalises a created email to lowercase', async () => {
@@ -69,7 +74,9 @@ describe('internal member routes', () => {
     expect(res.body).toEqual({ error: 'A member with this email already exists' });
 
     const list = await request(app).get('/internal/members').set(serviceKey);
-    expect(list.body).toEqual([{ id: 1, name: 'Ada Lovelace', email: 'ada@example.com' }]);
+    expect(list.body).toEqual([
+      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com', active: true },
+    ]);
   });
 
   it('lists every member for the service key alone', async () => {
@@ -84,7 +91,7 @@ describe('internal member routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([
-      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com' },
+      { id: 1, name: 'Ada Lovelace', email: 'ada@example.com', active: true },
       created.body,
     ]);
   });

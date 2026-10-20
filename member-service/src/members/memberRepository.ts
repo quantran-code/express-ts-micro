@@ -25,6 +25,7 @@ export class MemberRepository {
       id: this.nextId,
       name: input.name,
       email: normalizeEmail(input.email),
+      active: true,
     };
 
     this.nextId += 1;
@@ -47,6 +48,18 @@ export class MemberRepository {
     if (input.email !== undefined) {
       member.email = normalizeEmail(input.email);
     }
+
+    return member;
+  }
+
+  setActive(id: number, active: boolean): Member | undefined {
+    const member = this.findById(id);
+
+    if (!member) {
+      return undefined;
+    }
+
+    member.active = active;
 
     return member;
   }

@@ -2,7 +2,7 @@ import { RequestHandler, Router } from 'express';
 import { HttpError } from '../errors/httpError';
 import { isValidEmail } from '../members/email';
 import { memberRepository } from '../members/memberRepository';
-import { CreateMemberInput, Member } from '../members/types';
+import { CreateMemberInput, Member, UpdateMemberActiveInput } from '../members/types';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -37,6 +37,14 @@ function parseCreateInput(body: unknown): CreateMemberInput {
   };
 }
 
+function parseActiveInput(body: unknown): boolean {
+  if (!isRecord(body) || typeof body.active !== 'boolean') {
+    throw new HttpError(400, 'active must be a boolean');
+  }
+
+  return body.active;
+}
+
 const createMember: RequestHandler<Record<string, never>, Member, CreateMemberInput> = (
   req,
   res,
@@ -68,10 +76,35 @@ const getMemberInternal: RequestHandler<{ id: string }, Member> = (req, res, nex
   res.status(200).json(member);
 };
 
+const setMemberActive: RequestHandler<{ id: string }, Member, UpdateMemberActiveInput> = (
+  req,
+  res,
+  next,
+) => {
+  const id = Number.parseInt(req.params.id, 10);
+  const member = memberRepository.findById(id);
+
+  if (!member) {
+    next(new HttpError(404, 'Member not found'));
+    return;
+  }
+
+  const active = parseActiveInput(req.body);
+  const updated = memberRepository.setActive(id, active);
+
+  if (!updated) {
+    next(new HttpError(404, 'Member not found'));
+    return;
+  }
+
+  res.status(200).json(updated);
+};
+
 export const internalMembersRouter = Router();
 
 internalMembersRouter.post('/', createMember);
 internalMembersRouter.get('/', listMembersInternal);
 internalMembersRouter.get('/:id', getMemberInternal);
+internalMembersRouter.patch('/:id/active', setMemberActive);
 
 export default internalMembersRouter;

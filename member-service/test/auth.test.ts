@@ -132,7 +132,12 @@ describe('service gate and caller identity', () => {
     const res = await request(app).get('/members/1').set(memberIdentity);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: 1, name: 'Ada Lovelace', email: 'ada@example.com' });
+    expect(res.body).toEqual({
+      id: 1,
+      name: 'Ada Lovelace',
+      email: 'ada@example.com',
+      active: true,
+    });
   });
 
   it('forbids a member from reading another member record', async () => {
@@ -159,7 +164,12 @@ describe('service gate and caller identity', () => {
     expect(res.body).toEqual({ error: 'Forbidden' });
 
     const stored = await request(app).get('/members/2').set(librarianIdentity);
-    expect(stored.body).toEqual({ id: 2, name: 'Grace Hopper', email: 'grace@example.com' });
+    expect(stored.body).toEqual({
+      id: 2,
+      name: 'Grace Hopper',
+      email: 'grace@example.com',
+      active: true,
+    });
   });
 
   it('forbids a member from deleting another member', async () => {
