@@ -1,0 +1,22 @@
+{
+  "name": "express-ts-micro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Library management system split into six TypeScript microservices (api-gateway, auth, catalog, member, loan, reporting) for multi-repo/multi-service testing.",
+  "workspaces": [
+    "api-gateway",
+    "auth-service",
+    "catalog-service",
+    "member-service",
+    "loan-service",
+    "reporting-service"
+  ],
+  "scripts": {
+    "dev": "concurrently -n gateway,auth,catalog,member,loan,reporting -c blue,green,yellow,magenta,cyan,red \"npm run dev --workspace=api-gateway\" \"npm run dev --workspace=auth-service\" \"npm run dev --workspace=catalog-service\" \"npm run dev --workspace=member-service\" \"npm run dev --workspace=loan-service\" \"npm run dev --workspace=reporting-service\"",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
