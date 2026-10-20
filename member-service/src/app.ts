@@ -1,5 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { HttpError } from './errors/httpError';
+import { internalMembersRouter } from './internal/internalMembersRouter';
+import { membersRouter } from './members/membersRouter';
+import { requireIdentity } from './middleware/identity';
+import { requireServiceKey } from './middleware/serviceKey';
 
 const app = express();
 
@@ -9,7 +13,10 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', service: 'member-service' });
 });
 
-// TODO: mount this service's routes here once implemented.
+app.use(requireServiceKey);
+
+app.use('/members', requireIdentity, membersRouter);
+app.use('/internal/members', internalMembersRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not Found' });
